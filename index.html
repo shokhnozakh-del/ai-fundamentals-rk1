@@ -1,0 +1,295 @@
+<title>AI Fundamentals — RK1</title>
+<style>
+  :root {
+    --bg: #f6f4ee;
+    --surface: #ffffff;
+    --ink: #1c1e24;
+    --ink-soft: #52555f;
+    --line: #e2ddd0;
+    --accent: #2f4b7c;
+    --accent-ink: #ffffff;
+    --accent-soft: #e8edf6;
+    --warn: #a8461c;
+    --warn-soft: #f6e7df;
+    --good: #2f6b4f;
+    --good-soft: #e3efe8;
+    --radius: 14px;
+    --serif: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161b;
+      --surface: #1c1f26;
+      --ink: #eceae2;
+      --ink-soft: #a6a9b4;
+      --line: #30333c;
+      --accent: #7fa0d6;
+      --accent-ink: #0e1420;
+      --accent-soft: #212b3b;
+      --warn: #e0a07f;
+      --warn-soft: #3a261d;
+      --good: #8fcdae;
+      --good-soft: #1c2f26;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161b; --surface: #1c1f26; --ink: #eceae2; --ink-soft: #a6a9b4; --line: #30333c;
+    --accent: #7fa0d6; --accent-ink: #0e1420; --accent-soft: #212b3b;
+    --warn: #e0a07f; --warn-soft: #3a261d; --good: #8fcdae; --good-soft: #1c2f26;
+  }
+  :root[data-theme="light"] {
+    --bg: #f6f4ee; --surface: #ffffff; --ink: #1c1e24; --ink-soft: #52555f; --line: #e2ddd0;
+    --accent: #2f4b7c; --accent-ink: #ffffff; --accent-soft: #e8edf6;
+    --warn: #a8461c; --warn-soft: #f6e7df; --good: #2f6b4f; --good-soft: #e3efe8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; min-height: 100vh; background: var(--bg); color: var(--ink);
+    font-family: var(--sans); -webkit-user-select: none; user-select: none;
+    display: flex; justify-content: center; padding: 0;
+  }
+  .shell { width: 100%; max-width: 560px; min-height: 100vh; display: flex; flex-direction: column; }
+  header.bar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 20px; border-bottom: 1px solid var(--line); gap: 12px;
+  }
+  .brand { font-family: var(--serif); font-size: 1.05rem; letter-spacing: 0.01em; }
+  .timer {
+    font-variant-numeric: tabular-nums; font-size: 1rem; font-weight: 600;
+    padding: 4px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent);
+  }
+  .timer.warn { background: var(--warn-soft); color: var(--warn); }
+  .progress-track {
+    height: 4px; background: var(--line); position: relative; overflow: hidden;
+  }
+  .progress-fill { height: 100%; background: var(--accent); transition: width .25s ease; }
+  main { flex: 1; padding: 28px 20px 40px; display: flex; flex-direction: column; gap: 20px; }
+  h1 { font-family: var(--serif); font-size: 1.6rem; line-height: 1.25; text-wrap: balance; margin: 0 0 4px; }
+  p.lede { color: var(--ink-soft); margin: 0; line-height: 1.5; }
+  label.field { display: flex; flex-direction: column; gap: 6px; font-size: 0.9rem; color: var(--ink-soft); }
+  label.field span.req::after { content: " *"; color: var(--warn); }
+  input[type="text"] {
+    font-family: var(--sans); font-size: 1rem; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+  }
+  input[type="text"]:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+  button.primary {
+    font-family: var(--sans); font-size: 1.02rem; font-weight: 600; padding: 14px 18px;
+    border-radius: 10px; border: none; background: var(--accent); color: var(--accent-ink);
+    cursor: pointer;
+  }
+  button.primary:disabled { opacity: .4; cursor: not-allowed; }
+  button.primary:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
+  .qnum { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-soft); }
+  .qtext { font-family: var(--serif); font-size: 1.25rem; line-height: 1.4; text-wrap: balance; }
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    text-align: left; font-family: var(--sans); font-size: 1rem; padding: 14px 16px;
+    border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    cursor: pointer; line-height: 1.4;
+  }
+  .opt:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .opt .tag {
+    display: inline-block; width: 22px; height: 22px; border-radius: 50%; background: var(--accent-soft);
+    color: var(--accent); font-size: 0.75rem; font-weight: 700; text-align: center; line-height: 22px;
+    margin-right: 10px;
+  }
+  .warnbox {
+    display: flex; gap: 10px; align-items: flex-start; background: var(--warn-soft); color: var(--warn);
+    padding: 12px 14px; border-radius: 10px; font-size: 0.85rem; line-height: 1.4;
+  }
+  .result-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 24px; display: flex; flex-direction: column; gap: 14px; text-align: center;
+  }
+  .score-big { font-family: var(--serif); font-size: 3rem; font-variant-numeric: tabular-nums; }
+  .score-row { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 12px; }
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 999px; font-size: 0.78rem; font-weight: 600; }
+  .pill.good { background: var(--good-soft); color: var(--good); }
+  .pill.warn { background: var(--warn-soft); color: var(--warn); }
+  .hidden { display: none !important; }
+  footer.note { padding: 14px 20px; font-size: 0.78rem; color: var(--ink-soft); border-top: 1px solid var(--line); }
+</style>
+
+<div class="shell">
+  <header class="bar">
+    <span class="brand">AI Fundamentals · RK1</span>
+    <span class="timer" id="timer">50:00</span>
+  </header>
+  <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <main>
+    <section id="screen-start">
+      <h1>Midterm Control 1</h1>
+      <p class="lede">100 questions on AI fundamentals (topics 1–8), 50 minutes. Enter your details to begin — every student gets a different question and answer order.</p>
+      <label class="field">
+        <span class="req">Full name</span>
+        <input type="text" id="fullName" autocomplete="off" placeholder="e.g. Aidana Serikova">
+      </label>
+      <label class="field">
+        <span class="req">Group</span>
+        <input type="text" id="groupName" autocomplete="off" placeholder="e.g. IS-21-2">
+      </label>
+      <div class="warnbox">Keep this tab in focus during the test. Switching tabs or apps is logged and shown on your result screen.</div>
+      <button class="primary" id="startBtn" disabled>Start test</button>
+    </section>
+
+    <section id="screen-quiz" class="hidden">
+      <div class="qnum" id="qCounter">Question 1 of 100</div>
+      <div class="qtext" id="qText"></div>
+      <div class="opts" id="qOpts"></div>
+    </section>
+
+    <section id="screen-result" class="hidden">
+      <h1>Test finished</h1>
+      <div class="result-card">
+        <div class="score-big" id="scoreBig">0 / 100</div>
+        <div id="scoreName" style="color:var(--ink-soft)"></div>
+        <div class="score-row"><span>Time used</span><span id="timeUsed"></span></div>
+        <div class="score-row"><span>Tab switches</span><span id="tabSwitches"></span></div>
+      </div>
+      <p class="lede">Show this screen to your instructor, or keep it open — results are not sent automatically yet.</p>
+    </section>
+  </main>
+
+  <footer class="note">AI Fundamentals · Midterm 1 · Draft testing build</footer>
+</div>
+
+<iframe name="submitFrame" style="display:none"></iframe>
+<form id="submitForm" method="POST" target="submitFrame" action="https://script.google.com/macros/s/AKfycbxf-ajnom8A_uCYj0wVqdnlAnCwnKJkfTs7KewgxYt4xJSDxNVjTVW3_qsPCyggikFmuQ/exec" style="display:none">
+  <input type="text" name="name" id="f_name">
+  <input type="text" name="group" id="f_group">
+  <input type="text" name="score" id="f_score">
+  <input type="text" name="time" id="f_time">
+  <input type="text" name="switches" id="f_switches">
+</form>
+
+<script>
+(function () {
+  // ---- Question bank: [text, [opt0, opt1, opt2, opt3], correctIndex] ----
+  var RAW = [["What best defines artificial intelligence in the modern sense?",["Learning from data and adapting to situations","Software made only for playing games","A system used only for online search","A program that solves only math problems"],0],["What distinguishes AI from traditional software systems?",["Learning and adapting instead of fixed rules","Running faster than traditional programs","Needing no data at all","Working without any internet connection"],0],["Which common belief about AI does this course treat as a myth or oversimplification?",["That AI will fully replace human workers","That AI is used in digital services","That AI can process data","That AI exists on cloud platforms"],0],["In most real digital services, how does AI typically appear to the user?",["An embedded feature inside cloud-based services","An autonomous humanoid robot","Just a simple calculator app","A piece of printed documentation"],0],["In which areas is AI commonly applied in everyday life, according to the course?",["Across digital services, education, and media","Only inside video games","Only inside research laboratories","Only in heavy industry plants"],0],["Why is the definition of artificial intelligence not clear-cut?",["The line between AI and automation is blurry","No one has tried to define it","AI does not actually exist","It is purely a legal term"],0],["Why should not every automated system be considered artificial intelligence?",["Only systems that learn and adapt count as AI","Automated systems never use computers","AI must always be a physical robot","Automation and AI mean the same thing"],0],["What role do humans play when using AI systems, according to this course?",["Humans still decide and stay responsible","Humans have no role once it's deployed","Humans only build the hardware","Humans must disable the AI to use it"],0],["Why is it important to build a critical attitude toward AI's capabilities from the very start of studying this subject?",["To avoid both fearing and over-trusting AI","AI should never be studied at all","Critical thinking is only for advanced students","AI's capabilities never change over time"],0],["What does \"adaptability\" mean as a characteristic feature of AI?",["Adjusting behavior based on data","Running on any operating system","Connecting to any Wi-Fi network","Physically changing shape"],0],["Which of the following is given as an example of AI being used in education, according to the course?",["A digital tool built into learning platforms","Replacing all teachers completely","Printing textbooks faster","Only scheduling school buses"],0],["Why is AI frequently delivered as part of cloud-based digital services rather than as a standalone robot?",["Most AI lives inside cloud-based software","Clouds physically hold computer chips","Robots cannot connect to the internet","Cloud services never use software"],0],["Why is artificial intelligence considered important for the digital economy, according to the course?",["It's a key technology of the digital society","It removes the need for any economy","It only matters for printing money","It has no link to the economy"],0],["What was the main idea behind symbolic AI and expert systems?",["Writing human knowledge as fixed rules","Learning automatically from large datasets","Generating images from text","Playing games against humans"],0],["What was a major limitation of early (symbolic / expert-system) AI approaches?",["Struggling with uncertain, context-heavy problems","Having too much computing power","Having too much training data","Having rules that were too flexible"],0],["What mainly drove the shift from rule-based AI to trainable, data-driven models?",["Bigger datasets plus more computing power","The internet disappearing","A drop in available data","A ban on expert systems"],0],["How do generative models mainly differ from earlier AI systems?",["Creating new content instead of just retrieving it","Being unable to process any data","Working only with numbers","Needing no training at all"],0],["How should the evolution of AI best be understood?",["A shift between methods, not straight-line growth","An unchanging, constant technology","A purely random process","Just replacing computer hardware"],0],["Besides difficulty with uncertainty, what other limitation did expert systems have?",["Keeping their stored rules up to date","Using too little electricity","Being too creative","Needing no data of any kind"],0],["What is the key difference between trainable (learnable) models and rule-based systems?",["Learning patterns from examples, not fixed rules","Both learn from examples identically","Trainable models need no data","Rule-based systems are always generative"],0],["What role did data play in the historical development of AI, according to the course?",["Large datasets drove the shift to data-driven models","Data had no influence at all","Data only mattered for music files","Data slowed AI development down"],0],["According to the course, what remains true even for modern, more advanced AI systems?",["They still have limits and can err","They have no limitations at all","They never need any data","They're identical to the first AI systems"],0],["How did growing computing power influence the development of AI?",["Made data-driven models practical to run","It had no effect on AI","It erased expert systems overnight","It replaced the need for data"],0],["What is meant by describing AI's history as an \"evolution of approaches\"?",["A shift between methods, not pure growth","AI evolves once every hundred years","Approaches to AI never change","AI development is biological evolution"],0],["What is a defining trend in the current stage of AI development, according to the course?",["The rise of generative, content-creating models","A full return to rule-based systems","The disappearance of data-driven methods","A total stop in AI research"],0],["Why is understanding the historical evolution of AI useful, according to the course?",["It builds a critical view of today's tools","It's useful only for historians","It proves AI hasn't changed","It's irrelevant to using modern tools"],0],["What is generative AI's core capability?",["Creating new content, not just retrieving it","Only storing existing files","Only running number calculations","Only translating between two languages"],0],["For which kind of tasks is generative AI most effective, according to the course?",["Explaining ideas and structuring information","Only playing board games","Only printing out images","Only repairing computer hardware"],0],["Why do results from generative AI tools strongly depend on how a request is phrased?",["Output follows the prompt's wording, not its intent","It randomly ignores most prompts","It only accepts single-word input","Prompts are not processed at all"],0],["What is the key difference between using generative AI as \"help\" versus as a \"replacement for one's own thinking\"?",["Help supports thinking; replacement removes it","There is no real difference","Replacement is always the safer choice","Help always gives wrong answers"],0],["Who remains responsible for the final decision when using tools like ChatGPT, Gemini, or Grok?",["The human user, who must decide","The AI model itself alone","No one at all is responsible","The internet service provider only"],0],["Which is a correct example of using generative AI in academic study, according to the course?",["Getting an explanation, then working it through yourself","Submitting AI work as your own","Refusing to read AI output","Using it only to play games"],0],["Which is a correct example of using generative AI in professional work, according to the course?",["Drafting with AI, then reviewing it yourself","Letting it decide without any review","Using it only for entertainment","Avoiding any technology at work"],0],["How can errors typically appear in generative AI's responses, according to the course?",["As subtle distortions in meaning","Always as a red error message","Only as spelling mistakes","AI responses never contain errors"],0],["What does the course recommend when comparing AI services like ChatGPT and Gemini?",["Comparing styles on the same task","Assuming they always answer identically","Never using more than one service","Choosing based on name popularity"],0],["According to the course, why doesn't generative AI truly \"understand\" the meaning of what it produces?",["It follows patterns, not true comprehension","It cannot display text at all","It has no access to data","It only works with numbers"],0],["How can generative AI help in educational or professional work, according to the course?",["Generating ideas for the user to develop","Replacing all human input completely","Refusing to give any suggestions","Only generating random numbers"],0],["What is a key risk of using generative AI uncritically, according to the course?",["Weaker learning and analytical skills","Instant skill gains with no effort","No risk at all","Losing internet access permanently"],0],["What principle does the course recommend for choosing between different generative AI tools for a task?",["Matching the tool's strengths to the task","Always picking the newest tool","Never using more than one tool","Choosing by logo color"],0],["How does AI-based information search mainly differ from a traditional search engine?",["Analyzing and synthesizing, not just listing links","Never returning any results","Only working offline","Needing no data at all"],0],["What is an \"AI hallucination\"?",["False info presented as fact","A computer hardware malfunction","A type of computer virus","A type of image filter"],0],["Why can the same query give different results in ChatGPT, Gemini, and Perplexity?",["Each tool uses a different model","They are exactly the same tool","Only the display font changes","Questions can never be repeated"],0],["What skill does the course emphasize for checking information obtained through AI search?",["Verifying and comparing multiple sources","Trusting the first answer blindly","Ignoring all cited sources","Deleting the search history"],0],["Who is responsible for the final interpretation of information retrieved with AI?",["The human, who evaluates critically","The AI tool by itself","The search engine company alone","No one needs to check it"],0],["How is Perplexity generally described in contrast to ChatGPT/Gemini, according to the course?",["Focused on source-based search","Unable to access any information","Identical to ChatGPT in every way","Used only for drawing images"],0],["What does it mean that AI-based search \"synthesizes\" information from sources?",["Combining sources into one answer","Deleting all sources permanently","Repeating one single source","Converting sources into images"],0],["According to the course, which tool is given as an example for overview analysis and reporting, alongside Gemini?",["Copilot","A physical printer","A basic calculator","A paper notebook"],0],["What is a cause of AI \"hallucinations,\" according to the course?",["Model limits producing confident, unreliable text","A virus on the user's computer","The user typing too slowly","A problem with the Wi-Fi router"],0],["What practice does the course recommend for handling information obtained from AI tools?",["Cross-checking data across sources","Accepting the first answer blindly","Deleting data right after receiving it","Ignoring the topic entirely"],0],["According to the course, when is using AI for information search least reliable?",["For precise facts needing verification","For any search, under any circumstance","Only with a slow connection","Only on weekends"],0],["What is one practical benefit of using AI tools like ChatGPT for working with information, according to the course?",["Structuring and organizing materials","Deleting unorganized files permanently","Physically printing documents","Replacing the need for data"],0],["Why doesn't AI-based search fully replace traditional search engines, according to the course?",["Results still need human verification","AI tools can't connect to the internet","Traditional search engines no longer exist","AI never returns any information"],0],["Which are the main directions of AI development discussed in the course?",["NLP, computer vision, and recommendation systems","Only robotics research","Only blockchain technology","Only cybersecurity tools"],0],["What mainly determines how successful an AI system is in these directions?",["Data quality and problem framing","The color of the interface","The brand of the computer","The size of the office"],0],["What does natural language processing (NLP) study, as introduced in this course?",["Understanding and generating text","Processing only images","Recognizing only sound","Analyzing only map data"],0],["Why is the claim \"AI will replace all professions\" considered an oversimplification here?",["AI enhances work more than replacing it","AI can't be used in any profession","AI only works in agriculture","Professions never change over time"],0],["In which type of area does AI tend to achieve the most successful results?",["Clear tasks with plenty of good data","Areas with no data at all","Areas that forbid computers","Areas without any rules"],0],["In which kinds of situations does AI's performance remain limited, according to the course?",["Complex, socially nuanced contexts","Clean, well-defined datasets and tasks","Situations needing no judgment","AI has no limitations anywhere"],0],["What mainly explains the achievements of modern AI systems in areas like NLP and computer vision?",["Large amounts of relevant data","The interface's color scheme","The number of ads shown","The company's brand name"],0],["Why is AI described as not being a universal solution for every kind of task?",["Success depends on data and task clarity","AI is banned in most countries","AI only works on Tuesdays","AI needs no data in any case"],0],["What is identified as a main limitation of current AI technologies in their key application areas?",["Errors in nuanced, context-heavy cases","Being unable to process any data","Having no use in any field","Being too expensive to ever use"],0],["In which of these areas does the course mention AI achieving notable modern results?",["Media, analytics, and automation","Exclusively in agriculture","Exclusively in sports refereeing","Exclusively in Mars weather forecasts"],0],["Besides data quality, what else is described as critical to an AI system's success?",["Correctly framing the problem","The computer's physical size","The number of open tabs","The time of day used"],0],["Which of the following is mentioned as an area where AI is actively and successfully applied?",["Automating repetitive tasks","Writing and passing laws alone","Replacing the need for electricity","Eliminating every human profession"],0],["What was the original purpose of the Turing test?",["Judging if machine behavior seems intelligent","Measuring a computer's processing speed","Testing internet connection quality","Grading student essays automatically"],0],["Why has the Turing test lost its status as a universal criterion for AI intelligence today?",["Dialogue doesn't prove real understanding","Computers became too slow for it","The test is now illegal","No AI can hold a conversation"],0],["How do modern language models like ChatGPT produce \"smart-sounding\" responses?",["Statistical patterns, not real understanding","Thinking like a human brain","Copying from one fixed list","Asking a human for every answer"],0],["What is the key difference between \"simulating understanding\" and \"real understanding\"?",["Convincing output without grasping meaning","They are exactly the same thing","Real understanding is always faster","Simulating needs no data at all"],0],["Why is a critical attitude toward dialogue-based AI systems important?",["Confident answers can still be wrong","Dialogue systems are always correct","Critical thinking about AI isn't allowed","AI systems never make mistakes"],0],["Why was the Turing test considered a significant milestone in early AI research?",["An early benchmark for machine intelligence","It proved machines could never think","It was the only computer test ever","It measured internet speed"],0],["What is the key difference between the ability to hold a dialogue and actual intelligence, per the course?",["Conversation alone doesn't prove intelligence","They are exactly the same ability","Dialogue is harder than intelligence","Intelligence needs no communication"],0],["How do today's generative AI services illustrate the limitations of the Turing test, according to the course?",["Fluent dialogue without real thinking","They refuse to answer any question","They prove AI truly thinks","They've stopped being used for chat"],0],["What does the course note about the historical context of the Turing test?",["An early framing of machine intelligence","Created only in the last few years","Unrelated to AI's history","Designed to test hardware speed"],0],["What was the original goal behind developing the Turing test?",["A practical way to judge machine behavior","Creating a video game","Testing early computer battery life","Replacing human teachers"],0],["What is a key limitation of the Turing test in judging a system's true awareness or consciousness?",["It only checks surface-level conversation","It perfectly measures consciousness","It can't be used with any program","It needs no human judge"],0],["What risk does the course highlight in treating a dialogue-capable AI system as a genuinely \"thinking subject\"?",["Over-trusting answers, skipping review","It makes the system run faster","It eliminates all possible errors","It has no real consequence"],0],["What role does data play in modern AI systems, according to the course?",["The foundation shaping its capabilities","Data is irrelevant to performance","Only the programming language matters","Data only matters for games"],0],["What is an AI \"model,\" conceptually, as explained in the course?",["A generalization of learned patterns","A kind of physical robot","A type of internet browser","A printed textbook"],0],["Which of the following is described as a common source of errors in AI output?",["Incomplete, outdated, or distorted data","Having too much available electricity","Having perfect, unlimited training data","Receiving no training data at all"],0],["Why can AI give a confident-sounding answer that is actually incorrect?",["Output is probabilistic, not verified truth","It double-checks every fact first","It refuses to answer when unsure","It understands meaning like a human"],0],["What should guide a person's use of AI-generated results, according to the course?",["Critical evaluation of the output","Accepting every answer without question","Ignoring the original task","Letting AI decide everything alone"],0],["How does the absence of context affect an AI system's output, according to the course?",["Misinterpreted information, less accurate output","Always improves the output's accuracy","Has no effect on output at all","Stops the system completely"],0],["What is the fundamental difference between an AI model's output and human understanding, per the course?",["A statistical guess, not real meaning","They are identical processes","AI needs no data, humans do","Human understanding is always less accurate"],0],["Besides quality and volume, what other property of data is described as affecting AI performance?",["How diverse the data is","The file format it's saved in","The spreadsheet's color scheme","How many people viewed it"],0],["Why is an AI model described as a \"generalization of patterns\" rather than \"knowledge\"?",["It reflects statistics, not understanding","It stores every example with full understanding","It is a physical object","It never uses any data"],0],["What does it mean to say AI outputs are \"probabilistic\"?",["Likelihoods from data, not certainty","Always 100% guaranteed correct","Chosen completely at random","Never depends on training data"],0],["Why can outdated information be a source of AI errors, according to the course?",["Responses reflect only training-time facts","Outdated info makes AI run faster","AI updates training data in real time","Outdated info is never in training"],0],["What role does the volume (amount) of training data play in an AI system's capabilities, per the course?",["One factor shaping its capabilities","No effect on the system at all","Always makes a model slower","Only matters for storing music files"],0],["What are the main types of modern AI models discussed in this course?",["Language, visual, and multimodal models","Only pocket calculators","Only office printers","Only Wi-Fi routers"],0],["Why is there no single \"universal\" AI model that solves all tasks equally well?",["Each type suits different tasks","All AI models are identical","Models never make mistakes","Only one model exists worldwide"],0],["What mainly explains why the same query can produce different results in different AI tools?",["Different architectures and training","The query is randomly rewritten","All tools are built the same","Only the font size differs"],0],["What should guide the choice of an AI tool for a given task?",["Matching the model type to the task","Always choosing the newest tool","Always choosing the cheapest tool","Picking any tool at random"],0],["What remains the user's own responsibility when working with modern AI models?",["Critically evaluating every result","Nothing, the models are perfect","Only paying the subscription fee","Only clicking \"generate\""],0],["What mainly differentiates language models from visual models, according to the course?",["Text processing versus image processing","There is no real difference","Visual models can't process images","Language models only work with sound"],0],["Which kind of task are language models described as handling most effectively?",["Processing and generating text","Printing photographs physically","Repairing computer hardware","Measuring room temperature"],0],["According to the course, when is it appropriate to use a visual AI model rather than a language model?",["When the task involves images","When there's no data involved","Only with no internet connection","Only at night"],0],["What is a multimodal AI model, according to the course?",["Combining text, images, and more","Processing only one word at a time","Working only with sound","Needing no training data"],0],["For which kind of task are multimodal models especially suited, according to the course?",["Tasks mixing text and images","Tasks that ban image data","Tasks needing no data processing","Simple arithmetic only"],0],["What is given as a reason why different AI models can produce different answers to the same query?",["Different architecture and training","Different logo colors","Different internet plan prices","Questions can't be repeated"],0],["What does the course emphasize about services built on different AI models (e.g. language vs. visual vs. multimodal)?",["Each fits different kinds of tasks","All such services are identical","Only one should ever be used","None of them can be compared"],0]];
+
+  var fullName = document.getElementById('fullName');
+  var groupName = document.getElementById('groupName');
+  var startBtn = document.getElementById('startBtn');
+  var screenStart = document.getElementById('screen-start');
+  var screenQuiz = document.getElementById('screen-quiz');
+  var screenResult = document.getElementById('screen-result');
+  var qCounter = document.getElementById('qCounter');
+  var qText = document.getElementById('qText');
+  var qOpts = document.getElementById('qOpts');
+  var timerEl = document.getElementById('timer');
+  var progressFill = document.getElementById('progressFill');
+
+  function checkStart() {
+    startBtn.disabled = !(fullName.value.trim() && groupName.value.trim());
+  }
+  fullName.addEventListener('input', checkStart);
+  groupName.addEventListener('input', checkStart);
+
+  function shuffle(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  var questions = []; // per-session, shuffled order + shuffled options
+  var current = 0;
+  var score = 0;
+  var tabSwitches = 0;
+  var startTime = null;
+  var totalSeconds = 50 * 60;
+  var timeLeft = totalSeconds;
+  var timerHandle = null;
+
+  function buildSession() {
+    var order = shuffle(RAW.map(function (_, i) { return i; }));
+    questions = order.map(function (idx) {
+      var item = RAW[idx];
+      var optIdx = shuffle([0, 1, 2, 3]);
+      var opts = optIdx.map(function (i) { return item[1][i]; });
+      var correct = optIdx.indexOf(item[2]);
+      return { text: item[0], opts: opts, correct: correct, picked: null };
+    });
+  }
+
+  function fmtTime(s) {
+    var m = Math.floor(s / 60), sec = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (sec < 10 ? '0' : '') + sec;
+  }
+
+  function tick() {
+    timeLeft -= 1;
+    timerEl.textContent = fmtTime(Math.max(timeLeft, 0));
+    if (timeLeft <= 300) timerEl.classList.add('warn');
+    if (timeLeft <= 0) { clearInterval(timerHandle); finish(); }
+  }
+
+  function renderQuestion() {
+    var q = questions[current];
+    qCounter.textContent = 'Question ' + (current + 1) + ' of ' + questions.length;
+    qText.textContent = q.text;
+    progressFill.style.width = Math.round((current / questions.length) * 100) + '%';
+    qOpts.innerHTML = '';
+    var letters = ['A', 'B', 'C', 'D'];
+    q.opts.forEach(function (opt, i) {
+      var btn = document.createElement('button');
+      btn.className = 'opt';
+      btn.innerHTML = '<span class="tag">' + letters[i] + '</span>' + opt;
+      btn.addEventListener('click', function () { selectAnswer(i); });
+      qOpts.appendChild(btn);
+    });
+  }
+
+  function selectAnswer(i) {
+    var q = questions[current];
+    q.picked = i;
+    if (i === q.correct) score += 1;
+    current += 1;
+    if (current >= questions.length) { finish(); } else { renderQuestion(); }
+  }
+
+  function finish() {
+    clearInterval(timerHandle);
+    screenQuiz.classList.add('hidden');
+    screenResult.classList.remove('hidden');
+    progressFill.style.width = '100%';
+    document.getElementById('scoreBig').textContent = score + ' / ' + questions.length;
+    document.getElementById('scoreName').textContent = fullName.value.trim() + ' — ' + groupName.value.trim();
+    var used = totalSeconds - Math.max(timeLeft, 0);
+    document.getElementById('timeUsed').textContent = fmtTime(used);
+    document.getElementById('tabSwitches').textContent = tabSwitches;
+    submitResult(fullName.value.trim(), groupName.value.trim(), score + '/' + questions.length, fmtTime(used), tabSwitches);
+  }
+
+  function submitResult(name, group, score, time, switches) {
+    document.getElementById('f_name').value = name;
+    document.getElementById('f_group').value = group;
+    document.getElementById('f_score').value = score;
+    document.getElementById('f_time').value = time;
+    document.getElementById('f_switches').value = switches;
+    document.getElementById('submitForm').submit();
+  }
+
+  startBtn.addEventListener('click', function () {
+    buildSession();
+    screenStart.classList.add('hidden');
+    screenQuiz.classList.remove('hidden');
+    startTime = Date.now();
+    timerHandle = setInterval(tick, 1000);
+    renderQuestion();
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden && screenQuiz && !screenQuiz.classList.contains('hidden')) {
+      tabSwitches += 1;
+    }
+  });
+  document.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+  document.addEventListener('copy', function (e) { e.preventDefault(); });
+})();
+</script>
